@@ -6,11 +6,20 @@
 #include <stdio.h>
 int main(void)
 {
+    // char FILE_NAME[] = "data.txt";
+
+    while (1)
+    {
+        sleep(1);
+        if (access("data.txt", R_OK) == -1)
+            perror("access");
+        else
+            break;
+    }
+
     int fd, n;
     char buf[256];
-    mode_t mode; // 정의
-    mode = S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH;
-    fd = open("data.txt", O_CREAT | O_RDONLY, mode);
+    fd = open("data.txt", O_RDONLY);
     if (fd == -1)
     {
         perror("Open data.txt");

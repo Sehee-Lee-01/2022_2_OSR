@@ -1,8 +1,3 @@
 hello
 hi
-my name
-is 
-sehss
-hoho
-bye~~
-q
+are you ok?
