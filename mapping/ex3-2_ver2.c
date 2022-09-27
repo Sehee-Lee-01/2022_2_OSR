@@ -1,3 +1,4 @@
+// data.txt 파일 존재시 처리 루틴 변경
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
@@ -12,11 +13,13 @@ int main(void)
     mode_t mode;
     mode = S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH;
     fd = open("data.txt", O_CREAT | O_WRONLY | O_TRUNC, mode);
+
     if (fd == -1)
     {
         perror("Open data.txt");
         exit(1);
     }
+
     while (1)
     {
         write(1, ">> ", 3);    // 입력 프롬프트

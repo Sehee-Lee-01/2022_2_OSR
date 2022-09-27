@@ -1,13 +1,35 @@
+// (1) data.txt 파일 존재시 처리 루틴 변경
+// (2) ex3-3 이 ex3-2 보다 먼저 실행한 경우의 문제 해결하기
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <unistd.h>
+#include <dirent.h>
 #include <stdlib.h>
 #include <stdio.h>
 int main(void)
 {
+    DIR *check = NULL;
+    struct dirent *entry = NULL;
+    int exist = -1;
     int fd, n;
     char buf[256];
+
+    check = opendir(".");
+    while (exist != 1) // 존재 확인할 때까지
+    {
+        sleep(1);
+        entry = readdir(check);
+        while (entry)
+        {
+            if (entry->d_name == "data.txt")
+            {
+                exist = 1;
+                break;
+            }
+        }
+    }
+
     fd = open("data.txt", O_RDONLY);
     if (fd == -1)
     {
