@@ -9,27 +9,29 @@
 int main(void)
 {
     int fd, n;
-    struct stat buf_meta;
     char buf[256];
     mode_t mode;
+    struct stat buf_meta;
 
-    stat("unix.txt", &buf_meta);
+    stat("data.txt", &buf_meta);
+    int kind = buf_meta.st_mode & S_IFMT;
 
     // data 파일이 존재하면
     if (access("data.txt", R_OK) != -1)
     {
         // 가) data.txt 파일이 일반 파일이 아니면, 에러메시지 출력 후 종료
-        if ((buf_meta.st_mode & S_IFMT) != S_IFREG)
+        if (kind != S_IFREG)
         {
+            printf("Kind: %x\n", kind);
             perror("This is not general file.");
-            eixit(1);
+            exit(1);
         }
         // 나) GROUP/OTHER 에 읽기/쓰기 권한이 있으면,
         if ((buf_meta.st_mode & S_IRGRP) && (buf_meta.st_mode & S_IROTH) && (buf_meta.st_mode & S_IWGRP) && (buf_meta.st_mode & S_IWOTH))
         {
             // “data.txt must be protected” 와 같은 메시지 출력 후 종료
             printf("data.txt must be protected.");
-            eixit(1);
+            exit(1);
         }
     }
 
