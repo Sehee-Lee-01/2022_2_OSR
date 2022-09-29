@@ -30,7 +30,7 @@ int main(void)
         exit(1);
     }
     // 나) GROUP/OTHER 에 읽기/쓰기 권한이 있으면,
-    if ((buf_meta.st_mode & S_IRGRP) && (buf_meta.st_mode & S_IROTH) && (buf_meta.st_mode & S_IWGRP) && (buf_meta.st_mode & S_IWOTH))
+    if ((buf_meta.st_mode & S_IRGRP & S_IROTH & S_IWGRP & S_IWOTH))
     {
         // “data.txt must be protected” 와 같은 메시지 출력 후 종료
         printf("data.txt must be protected.");
@@ -52,7 +52,8 @@ int main(void)
     // ex3-2로 부터 정상적으로 데이터 수신하도록 만들기
     int data_size = (int)buf_meta.st_size;
     int data_mtime = (int)buf_meta.st_mtime;
-    int running = 1; // flag
+    int running = 1, deleted = 0; // flag
+
     if ((int)buf_meta.st_size != 0)
         lseek(fd, 0, SEEK_END);
 
@@ -61,7 +62,28 @@ int main(void)
         // Ex3-3 은 파일을 연 후,
         // (1) 현재 파일 상태 기억: 현재 파일 변경 시간? 파일 크기?
         // (2) 상태가 변경 될 경우, 읽기 시작
+        // 파일이 삭제 되었을 경우
+        if (access("data.txt", R_OK) == -1)
+            deleted = 1;
+
+        while (deleted)
+        {
+            if (access("data.txt", R_OK) == -1)
+            {
+                sleep(1);
+                perror("access");
+            }
+            else
+            {
+                close(fd);
+                fd = open("data.txt", O_RDONLY);
+                deleted = 0;
+                break;
+            }
+        }
+
         stat("data.txt", &buf_meta);
+
         if ((int)buf_meta.st_size == 0)
         {
             lseek(fd, 0, SEEK_SET);
